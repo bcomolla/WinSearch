@@ -18,12 +18,9 @@ public static class AcrylicHelper
 
     public static void Apply(Window window)
     {
+        if (!WindowsVersionHelper.IsWindows11()) return;
         var handle = new WindowInteropHelper(window).EnsureHandle();
-
-        if (WindowsVersionHelper.IsWindows11())
-            ApplyMica(handle);
-        else
-            ApplyAcrylic(handle);
+        ApplyMica(handle);
     }
 
     private static void ApplyMica(IntPtr handle)

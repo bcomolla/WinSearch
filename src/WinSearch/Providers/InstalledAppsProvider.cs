@@ -1,4 +1,7 @@
 using System.Diagnostics;
+using System.Windows;
+using System.Windows.Interop;
+using System.Windows.Media.Imaging;
 using Microsoft.Win32;
 using WinSearch.Core;
 using WinSearch.Models;
@@ -42,9 +45,14 @@ public class InstalledAppsProvider : ISearchProvider
                         {
                             using var sub = root.OpenSubKey(subName);
                             var name = sub?.GetValue("DisplayName") as string;
-                            var exe = sub?.GetValue("DisplayIcon") as string;
+                            var iconRaw = sub?.GetValue("DisplayIcon") as string;
                             if (string.IsNullOrWhiteSpace(name)) continue;
-                            apps.Add(new AppEntry { Name = name, ExecutablePath = exe ?? "" });
+                            apps.Add(new AppEntry
+                            {
+                                Name = name,
+                                ExecutablePath = iconRaw?.Split(',')[0].Trim('"') ?? "",
+                                Icon = ExtractIcon(iconRaw)
+                            });
                         }
                         catch { }
                     }
@@ -56,6 +64,22 @@ public class InstalledAppsProvider : ISearchProvider
         _apps = apps.DistinctBy(a => a.Name).ToList();
     }
 
+    private static BitmapSource? ExtractIcon(string? rawPath)
+    {
+        if (string.IsNullOrWhiteSpace(rawPath)) return null;
+        var path = rawPath.Split(',')[0].Trim('"').Trim();
+        if (!System.IO.File.Exists(path)) return null;
+        try
+        {
+            using var icon = System.Drawing.Icon.ExtractAssociatedIcon(path);
+            if (icon == null) return null;
+            var bmp = Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            bmp.Freeze();
+            return bmp;
+        }
+        catch { return null; }
+    }
+
     public Task<IEnumerable<SearchResult>> SearchAsync(string query, CancellationToken ct = default)
     {
         var results = new List<SearchResult>();
@@ -64,7 +88,6 @@ public class InstalledAppsProvider : ISearchProvider
             double score = FuzzyMatcher.Score(query, app.Name);
             if (score > 0)
             {
-                var exePath = app.ExecutablePath.Split(',')[0].Trim('"');
                 results.Add(new SearchResult
                 {
                     Id = $"app:{app.Name}",
@@ -72,8 +95,9 @@ public class InstalledAppsProvider : ISearchProvider
                     Subtitle = "Application",
                     Category = SearchCategory.App,
                     Score = score,
-                    Action = string.IsNullOrEmpty(exePath) ? null : () =>
-                        Process.Start(new ProcessStartInfo { FileName = exePath, UseShellExecute = true })
+                    Icon = app.Icon,
+                    Action = string.IsNullOrEmpty(app.ExecutablePath) ? null : () =>
+                        Process.Start(new ProcessStartInfo { FileName = app.ExecutablePath, UseShellExecute = true })
                 });
             }
         }
@@ -84,5 +108,6 @@ public class InstalledAppsProvider : ISearchProvider
     {
         public string Name { get; set; } = "";
         public string ExecutablePath { get; set; } = "";
+        public BitmapSource? Icon { get; set; }
     }
 }
