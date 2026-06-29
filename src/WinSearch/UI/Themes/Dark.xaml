@@ -1,0 +1,19 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <SolidColorBrush x:Key="OverlayBackground" Color="#CC1C1C1C"/>
+    <SolidColorBrush x:Key="SearchBoxForeground" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="SearchIconForeground" Color="#888888"/>
+    <SolidColorBrush x:Key="PlaceholderForeground" Color="#555555"/>
+    <SolidColorBrush x:Key="SeparatorColor" Color="#333333"/>
+    <SolidColorBrush x:Key="ResultBackground" Color="Transparent"/>
+    <SolidColorBrush x:Key="ResultSelectedBackground" Color="#2A2A2A"/>
+    <SolidColorBrush x:Key="ResultTitleForeground" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="ResultSubtitleForeground" Color="#888888"/>
+    <SolidColorBrush x:Key="BadgeBackground" Color="#0078D4"/>
+    <SolidColorBrush x:Key="BadgeForeground" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="HintForeground" Color="#555555"/>
+
+    <DropShadowEffect x:Key="OverlayShadow" BlurRadius="30" ShadowDepth="6" Opacity="0.6" Color="Black"/>
+
+</ResourceDictionary>
