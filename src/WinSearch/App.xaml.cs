@@ -74,7 +74,7 @@ public partial class App : Application
         // wait for it to load (which creates the HWND), then register and hide it.
         _overlay.Show();
         _overlay.Hide();
-        bool hotkeyRegistered = _hotkey.Register(_overlay, 0x0008 /* MOD_WIN */, 0x20 /* VK_SPACE */,
+        bool hotkeyRegistered = _hotkey.Register(_overlay, 0x0002 /* MOD_CONTROL */, 0x23 /* VK_END */,
             () => Dispatcher.Invoke(ToggleOverlay));
         if (!hotkeyRegistered)
             MessageBox.Show("Could not register Win+Space hotkey — it may be in use by another application.\nYou can change it in Settings.", "WinSearch");

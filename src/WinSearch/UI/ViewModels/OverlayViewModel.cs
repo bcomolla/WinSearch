@@ -12,9 +12,14 @@ public partial class OverlayViewModel : ObservableObject
     private CancellationTokenSource _cts = new();
     private System.Timers.Timer? _debounce;
 
-    [ObservableProperty] private string _query = "";
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsQueryEmpty))]
+    private string _query = "";
+
     [ObservableProperty] private SearchResult? _selectedResult;
     [ObservableProperty] private bool _isSearching;
+
+    public bool IsQueryEmpty => string.IsNullOrEmpty(Query);
+    public bool HasResults => Results.Count > 0;
 
     public ObservableCollection<SearchResult> Results { get; } = new();
 
@@ -23,6 +28,7 @@ public partial class OverlayViewModel : ObservableObject
         _engine = engine;
         _debounce = new System.Timers.Timer(150) { AutoReset = false };
         _debounce.Elapsed += async (_, _) => await RunSearchAsync();
+        Results.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasResults));
     }
 
     partial void OnQueryChanged(string value)

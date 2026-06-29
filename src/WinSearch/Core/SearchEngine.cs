@@ -1,3 +1,4 @@
+using WinSearch.Helpers;
 using WinSearch.Models;
 using WinSearch.Providers;
 
@@ -34,9 +35,12 @@ public class SearchEngine
             .Select(g => g.OrderByDescending(r => r.Score).First())
             .ToList();
 
-        // Apply frecency boost
+        // Apply frecency boost and icons
         foreach (var r in deduped)
+        {
             r.FrecencyBoost = _frecency.GetBoost(r.Id);
+            r.Icon ??= IconHelper.GetCategoryIcon(r.Category);
+        }
 
         return deduped
             .OrderByDescending(r => r.FinalScore)
